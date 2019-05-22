@@ -40,39 +40,39 @@ namespace IdentityServer4.Contrib.Caching.Abstractions.Stores
         {
             var storingTasks = new[]
             {
-                this.StoreAsync(grant, grant.Key),
-                this.AppendAsync(grant, this.GetCombineSubjectKey(grant.SubjectId))
+                this.StoreAsync(grant, this.GetCombinedKey(grant.Key)),
+                this.AppendAsync(grant, this.GetCombinedKey(grant.SubjectId))
             };
 
             await Task.WhenAll(storingTasks);
         }
 
-        public virtual Task<PersistedGrant> GetAsync(string key) => this.FindAsync(key);
+        public virtual Task<PersistedGrant> GetAsync(string key)
+            => this.FindAsync(this.GetCombinedKey(key));
 
         public virtual async Task<IEnumerable<PersistedGrant>> GetAllAsync(string subjectId)
-            => await this.FindAllAsync(this.GetCombineSubjectKey(subjectId));
+            => await this.FindAllAsync(this.GetCombinedKey(subjectId));
 
-        public virtual Task RemoveAsync(string key) => this.distributedCache.RemoveAsync(key);
+        public virtual Task RemoveAsync(string key)
+            => this.distributedCache.RemoveAsync(this.GetCombinedKey(key));
 
         public virtual async Task RemoveAllAsync(string subjectId, string clientId)
         {
             var grants = await this.GetAllAsync(subjectId);
 
             var enumeratedGrants = grants as PersistedGrant[] ?? grants.ToArray();
-            
+
             var deletationTasks = enumeratedGrants
                 .Where(grant => grant.ClientId == clientId)
-                .Select(async grant =>
-                {
-                    await this.distributedCache.RemoveAsync(grant.Key);
-                }).ToList();
-            
-            var combinedSubjectKey = this.GetCombineSubjectKey(subjectId);
+                .Select(async grant => await this.distributedCache.RemoveAsync(this.GetCombinedKey(grant.Key)))
+                .ToList();
+
+            var combinedSubjectKey = this.GetCombinedKey(subjectId);
 
             deletationTasks.Add(this.distributedCache.RemoveAsync(combinedSubjectKey));
 
             await Task.WhenAll(deletationTasks);
-            
+
             var grantsToStore = enumeratedGrants
                 .Where(grant => grant.ClientId != clientId)
                 .ToArray();
@@ -86,23 +86,20 @@ namespace IdentityServer4.Contrib.Caching.Abstractions.Stores
         public virtual async Task RemoveAllAsync(string subjectId, string clientId, string type)
         {
             var grants = await this.GetAllAsync(subjectId);
-            
+
             var enumeratedGrants = grants as PersistedGrant[] ?? grants.ToArray();
 
             var deletationTasks = enumeratedGrants
                 .Where(grant => grant.ClientId == clientId && grant.Type == type)
-                .Select(async grant =>
-                {
-                    await this.distributedCache.RemoveAsync(grant.Key);
-                })
+                .Select(async grant => await this.distributedCache.RemoveAsync(this.GetCombinedKey(grant.Key)))
                 .ToList();
-            
-            var combinedSubjectKey = this.GetCombineSubjectKey(subjectId);
-            
+
+            var combinedSubjectKey = this.GetCombinedKey(subjectId);
+
             deletationTasks.Add(this.distributedCache.RemoveAsync(combinedSubjectKey));
 
             await Task.WhenAll(deletationTasks);
-            
+
             var grantsToStore = enumeratedGrants
                 .Where(grant => grant.ClientId != clientId && grant.Type != type)
                 .ToArray();
@@ -113,9 +110,9 @@ namespace IdentityServer4.Contrib.Caching.Abstractions.Stores
             }
         }
 
-        protected virtual async Task<ICollection<PersistedGrant>> FindAllAsync(string key)
+        protected virtual async Task<ICollection<PersistedGrant>> FindAllAsync(string combinedKey)
         {
-            var bytes = await this.distributedCache.GetAsync(key);
+            var bytes = await this.distributedCache.GetAsync(combinedKey);
 
             if (bytes == null) return new List<PersistedGrant>();
 
@@ -124,9 +121,9 @@ namespace IdentityServer4.Contrib.Caching.Abstractions.Stores
                 DistributedCacheGrantStoreService.SerializerSettings);
         }
 
-        protected virtual async Task<PersistedGrant> FindAsync(string key)
+        protected virtual async Task<PersistedGrant> FindAsync(string combinedKey)
         {
-            var bytes = await this.distributedCache.GetAsync(key);
+            var bytes = await this.distributedCache.GetAsync(combinedKey);
 
             if (bytes == null) return null;
 
@@ -141,16 +138,16 @@ namespace IdentityServer4.Contrib.Caching.Abstractions.Stores
             {
                 AbsoluteExpiration = grant.Expiration.GetValueOrDefault()
             };
-            
-            return this.distributedCache.SetAsync(key,
-            Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(grant,
-                DistributedCacheGrantStoreService.SerializerSettings)), cachingOptions);
-        }
-            
 
-        protected virtual async Task AppendAsync(PersistedGrant grant, string key)
+            return this.distributedCache.SetAsync(key,
+                Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(grant,
+                    DistributedCacheGrantStoreService.SerializerSettings)), cachingOptions);
+        }
+
+
+        protected virtual async Task AppendAsync(PersistedGrant grant, string combinedKey)
         {
-            var existingGrantsForSubject = await this.FindAllAsync(key);
+            var existingGrantsForSubject = await this.FindAllAsync(combinedKey);
 
             existingGrantsForSubject.Add(grant);
 
@@ -158,12 +155,13 @@ namespace IdentityServer4.Contrib.Caching.Abstractions.Stores
             {
                 AbsoluteExpiration = grant.Expiration.GetValueOrDefault()
             };
-            
-            await this.distributedCache.SetAsync(key,
-                Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(existingGrantsForSubject, DistributedCacheGrantStoreService.SerializerSettings)), cacheOptions);
+
+            await this.distributedCache.SetAsync(combinedKey,
+                Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(existingGrantsForSubject,
+                    DistributedCacheGrantStoreService.SerializerSettings)), cacheOptions);
         }
 
-        protected string GetCombineSubjectKey(string subjectId)
-            => $"{this.cacheConfiguration.CachingKeyPrefix}{subjectId}";
+        protected virtual string GetCombinedKey(string key)
+            => $"{this.cacheConfiguration.CachingKeyPrefix}{key}";
     }
 }

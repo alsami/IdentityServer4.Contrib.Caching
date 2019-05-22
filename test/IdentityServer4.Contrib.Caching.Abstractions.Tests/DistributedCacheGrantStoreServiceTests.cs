@@ -339,13 +339,13 @@ namespace IdentityServer4.Contrib.Caching.Abstractions.Tests
             var returnBytes = GetBytes(Serialize(grant));
 
             mock.Setup(cache =>
-                    cache.GetAsync(key.ToString(), It.IsAny<CancellationToken>()))
+                    cache.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(returnBytes);
 
             var foundGrant = await cacheStoreService.GetAsync(key.ToString());
 
             mock.Verify(
-                cache => cache.GetAsync(key.ToString(), It.IsAny<CancellationToken>()), Times.Once);
+                cache => cache.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
 
             Assert.NotNull(foundGrant);
             var foundBytes = GetBytes(Serialize(foundGrant));

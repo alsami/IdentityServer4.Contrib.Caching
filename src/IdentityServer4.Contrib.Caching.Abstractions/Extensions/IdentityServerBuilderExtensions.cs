@@ -9,7 +9,7 @@ namespace IdentityServer4.Contrib.Caching.Abstractions.Extensions
     {
         public static IIdentityServerBuilder
             AddDistributedCacheGrantStore<TDistributedGrantStrore>(this IIdentityServerBuilder builder,
-                string cachingPrefix = "IdentityServer_Distributed_Caching_")
+                string cachingPrefix = "_IdentityServer_Distributed_Caching_")
             where TDistributedGrantStrore : DistributedCacheGrantStoreService
         {
             cachingPrefix.EnsureParamter(nameof(cachingPrefix));
