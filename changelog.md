@@ -1,1 +1,10 @@
-# TBD
+# [1.0.0](https://www.nuget.org/packages/IdentityServer4.Contrib.Caching.Redis/1.0.0) (2019-05-25)
+
+## IdentityServer4.Contrib.Caching.Redis
+
+### Initial release
+
+This is the first release that uses `IDistributedCache` with the implementation of [Microsoft.Extensions.Caching.StackExchangeRedis](https://www.nuget.org/packages/Microsoft.Extensions.Caching.StackExchangeRedis/2.2.5) for storing grants of `IdentityServer4` in a distributed fashion. For more information on how to install and use this package, please checkout the [readme](readme.md).
+
+
+

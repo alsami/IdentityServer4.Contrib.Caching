@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using IdentityServer4.Contrib.Caching.Abstractions.Stores;
+using IdentityServer4.Contrib.Caching.Redis.Stores;
 using IdentityServer4.Contrib.Caching.Redis.Tests.Misc;
 using IdentityServer4.Models;
 using IdentityServer4.Stores;
@@ -12,13 +12,13 @@ using Xunit;
 
 namespace IdentityServer4.Contrib.Caching.Redis.Tests
 {
-    public class RedisCacheGrantStoreServiceIntegrationTests : IClassFixture<ConfigurationFixture>,
+    public class RedisCacheGrantServiceIntegrationTests : IClassFixture<ConfigurationFixture>,
         IClassFixture<ServiceProviderFixture>
     {
         private readonly ConfigurationFixture configurationFixture;
         private readonly ServiceProviderFixture serviceProviderFixture;
 
-        public RedisCacheGrantStoreServiceIntegrationTests(ConfigurationFixture configurationFixture,
+        public RedisCacheGrantServiceIntegrationTests(ConfigurationFixture configurationFixture,
             ServiceProviderFixture serviceProviderFixture)
         {
             this.configurationFixture = configurationFixture;
@@ -26,7 +26,7 @@ namespace IdentityServer4.Contrib.Caching.Redis.Tests
         }
 
         [Fact]
-        public async Task RedisCacheGrantStoreService_StoreAsync_Valid_Grant_Succeeds()
+        public async Task RedisCacheGrantStore_StoreAsync_Valid_Grant_Succeeds()
         {
             var provider =
                 this.serviceProviderFixture.BuildDefaultServiceProvider(this.configurationFixture.RedisCacheOptions);
@@ -37,7 +37,7 @@ namespace IdentityServer4.Contrib.Caching.Redis.Tests
             {
                 ClientId = "1",
                 CreationTime = DateTime.UtcNow,
-                Expiration = DateTime.UtcNow.AddDays(1),
+                Expiration = DateTime.UtcNow.AddHours(1),
                 Key = Guid.NewGuid().ToString(),
                 SubjectId = Guid.NewGuid().ToString(),
                 Type = "Some-Type",
@@ -48,7 +48,7 @@ namespace IdentityServer4.Contrib.Caching.Redis.Tests
         }
 
         [Fact]
-        public async Task RedisCacheGrantStoreService_FindAsync_Valid_Key_Succeeds()
+        public async Task RedisCacheGrantStore_FindAsync_Valid_Key_Succeeds()
         {
             var provider =
                 this.serviceProviderFixture.BuildDefaultServiceProvider(this.configurationFixture.RedisCacheOptions);
@@ -59,7 +59,7 @@ namespace IdentityServer4.Contrib.Caching.Redis.Tests
             {
                 ClientId = "1",
                 CreationTime = DateTime.UtcNow,
-                Expiration = DateTime.UtcNow.AddDays(1),
+                Expiration = DateTime.UtcNow.AddHours(1),
                 Key = Guid.NewGuid().ToString(),
                 SubjectId = Guid.NewGuid().ToString(),
                 Type = "Some-Type",
@@ -75,7 +75,7 @@ namespace IdentityServer4.Contrib.Caching.Redis.Tests
         }
 
         [Fact]
-        public async Task RedisCacheGrantStoreService_FindAsync_Invalid_Key_Returns_Null()
+        public async Task RedisCacheGrantStore_FindAsync_Invalid_Key_Returns_Null()
         {
             var provider =
                 this.serviceProviderFixture.BuildDefaultServiceProvider(this.configurationFixture.RedisCacheOptions);
@@ -88,7 +88,7 @@ namespace IdentityServer4.Contrib.Caching.Redis.Tests
         }
 
         [Fact]
-        public async Task RedisCacheGrantStoreService_RemoveAsync_Valid_Key_Succeeds()
+        public async Task RedisCacheGrantStore_RemoveAsync_Valid_Key_Succeeds()
         {
             var provider =
                 this.serviceProviderFixture.BuildDefaultServiceProvider(this.configurationFixture.RedisCacheOptions);
@@ -104,7 +104,7 @@ namespace IdentityServer4.Contrib.Caching.Redis.Tests
                 {
                     ClientId = "1",
                     CreationTime = DateTime.UtcNow,
-                    Expiration = DateTime.UtcNow.AddDays(1),
+                    Expiration = DateTime.UtcNow.AddHours(1),
                     Key = key1,
                     SubjectId = Guid.NewGuid().ToString(),
                     Type = "Some-Type",
@@ -114,7 +114,7 @@ namespace IdentityServer4.Contrib.Caching.Redis.Tests
                 {
                     ClientId = "1",
                     CreationTime = DateTime.UtcNow,
-                    Expiration = DateTime.UtcNow.AddDays(1),
+                    Expiration = DateTime.UtcNow.AddHours(1),
                     Key = key2,
                     SubjectId = Guid.NewGuid().ToString(),
                     Type = "Some-Type",
@@ -135,7 +135,7 @@ namespace IdentityServer4.Contrib.Caching.Redis.Tests
         }
 
         [Fact]
-        public async Task RedisCacheGrantStoreService_RemoveAsync_Invalid_Key_Succeeds()
+        public async Task RedisCacheGrantStore_RemoveAsync_Invalid_Key_Succeeds()
         {
             var provider =
                 this.serviceProviderFixture.BuildDefaultServiceProvider(this.configurationFixture.RedisCacheOptions);
@@ -146,7 +146,7 @@ namespace IdentityServer4.Contrib.Caching.Redis.Tests
         }
 
         [Fact]
-        public async Task RedisCacheGrantStoreService_GetAllAsync_Valid_SubjectId_Succeeds()
+        public async Task RedisCacheGrantStore_GetAllAsync_Valid_SubjectId_Succeeds()
         {
             var provider =
                 this.serviceProviderFixture.BuildDefaultServiceProvider(this.configurationFixture.RedisCacheOptions);
@@ -162,7 +162,7 @@ namespace IdentityServer4.Contrib.Caching.Redis.Tests
                 {
                     ClientId = "1",
                     CreationTime = DateTime.UtcNow,
-                    Expiration = DateTime.UtcNow.AddDays(1),
+                    Expiration = DateTime.UtcNow.AddHours(1),
                     Key = Guid.NewGuid().ToString(),
                     SubjectId = subjectId1,
                     Type = "Some-Type",
@@ -172,7 +172,7 @@ namespace IdentityServer4.Contrib.Caching.Redis.Tests
                 {
                     ClientId = "1",
                     CreationTime = DateTime.UtcNow,
-                    Expiration = DateTime.UtcNow.AddDays(1),
+                    Expiration = DateTime.UtcNow.AddHours(1),
                     Key = Guid.NewGuid().ToString(),
                     SubjectId = subjectId1,
                     Type = "Some-Type",
@@ -182,7 +182,7 @@ namespace IdentityServer4.Contrib.Caching.Redis.Tests
                 {
                     ClientId = "1",
                     CreationTime = DateTime.UtcNow,
-                    Expiration = DateTime.UtcNow.AddDays(1),
+                    Expiration = DateTime.UtcNow.AddHours(1),
                     Key = Guid.NewGuid().ToString(),
                     SubjectId = subjectId1,
                     Type = "Some-Type",
@@ -192,7 +192,7 @@ namespace IdentityServer4.Contrib.Caching.Redis.Tests
                 {
                     ClientId = "1",
                     CreationTime = DateTime.UtcNow,
-                    Expiration = DateTime.UtcNow.AddDays(1),
+                    Expiration = DateTime.UtcNow.AddHours(1),
                     Key = Guid.NewGuid().ToString(),
                     SubjectId = subjectId2,
                     Type = "Some-Type",
@@ -202,7 +202,7 @@ namespace IdentityServer4.Contrib.Caching.Redis.Tests
                 {
                     ClientId = "1",
                     CreationTime = DateTime.UtcNow,
-                    Expiration = DateTime.UtcNow.AddDays(1),
+                    Expiration = DateTime.UtcNow.AddHours(1),
                     Key = Guid.NewGuid().ToString(),
                     SubjectId = subjectId2,
                     Type = "Some-Type",
@@ -212,7 +212,7 @@ namespace IdentityServer4.Contrib.Caching.Redis.Tests
                 {
                     ClientId = "1",
                     CreationTime = DateTime.UtcNow,
-                    Expiration = DateTime.UtcNow.AddDays(1),
+                    Expiration = DateTime.UtcNow.AddHours(1),
                     Key = Guid.NewGuid().ToString(),
                     SubjectId = subjectId1,
                     Type = "Some-Type",
@@ -220,21 +220,24 @@ namespace IdentityServer4.Contrib.Caching.Redis.Tests
                 },
             };
 
-            foreach (var grant in grants)
-            {
-                await cacheService.StoreAsync(grant);
-            }
+            await Task.WhenAll(grants.Select(async grant => await cacheService.StoreAsync(grant)));
 
             var foundGrants = await cacheService.GetAllAsync(subjectId1);
-            var enumeratedGrants = foundGrants as PersistedGrant[] ?? foundGrants.ToArray();
+
+            var enumeratedGrants = foundGrants.OrderBy(x => x.Expiration).ToArray();
+
             Assert.NotEmpty(enumeratedGrants);
             Assert.Equal(4, enumeratedGrants.Length);
-            var relevantStoreGrants = grants.Where(grant => grant.SubjectId == subjectId1).ToArray();
+
+            var relevantStoreGrants = grants
+                .Where(grant => grant.SubjectId == subjectId1)
+                .OrderBy(g => g.Expiration)
+                .ToArray();
             Assert.Equal(GetBytes(Serialize(relevantStoreGrants)), GetBytes(Serialize(enumeratedGrants)));
         }
 
         [Fact]
-        public async Task RedisCacheGrantStoreService_GetAllAsync_Invalid_SubjectId_Returns_Empty_Enumeration()
+        public async Task RedisCacheGrantStore_GetAllAsync_Invalid_SubjectId_Returns_Empty_Enumeration()
         {
             var provider =
                 this.serviceProviderFixture.BuildDefaultServiceProvider(this.configurationFixture.RedisCacheOptions);
@@ -248,7 +251,7 @@ namespace IdentityServer4.Contrib.Caching.Redis.Tests
         }
 
         [Fact]
-        public async Task RedisCacheGrantStoreService_GetAsync_Valid_Key_Succeeds()
+        public async Task RedisCacheGrantStore_GetAsync_Valid_Key_Succeeds()
         {
             var provider =
                 this.serviceProviderFixture.BuildDefaultServiceProvider(this.configurationFixture.RedisCacheOptions);
@@ -261,7 +264,7 @@ namespace IdentityServer4.Contrib.Caching.Redis.Tests
                 SubjectId = Guid.NewGuid().ToString(),
                 ClientId = "1",
                 Data = "some-data",
-                Expiration = DateTime.UtcNow.AddDays(1),
+                Expiration = DateTime.UtcNow.AddHours(1),
                 CreationTime = DateTime.UtcNow,
                 Type = "some-type"
             };
@@ -275,7 +278,7 @@ namespace IdentityServer4.Contrib.Caching.Redis.Tests
         }
 
         [Fact]
-        public async Task RedisCacheGrantStoreService_GetAsync_Invalid_Key_Returns_Null()
+        public async Task RedisCacheGrantStore_GetAsync_Invalid_Key_Returns_Null()
         {
             var provider =
                 this.serviceProviderFixture.BuildDefaultServiceProvider(this.configurationFixture.RedisCacheOptions);
@@ -288,14 +291,14 @@ namespace IdentityServer4.Contrib.Caching.Redis.Tests
         }
 
         [Fact]
-        public async Task RedisCacheGrantStoreService_RemoveAllAsync_SubjectId_ClientId_Removes_Only_Wanted()
+        public async Task RedisCacheGrantStore_RemoveAllAsync_SubjectId_ClientId_Removes_Only_Wanted()
         {
             var provider =
                 this.serviceProviderFixture.BuildDefaultServiceProvider(this.configurationFixture.RedisCacheOptions);
 
             var cacheService = provider.GetRequiredService<IPersistedGrantStore>();
 
-            var subjectId1 = Guid.NewGuid().ToString();
+            var subjectId = Guid.NewGuid().ToString();
 
             var grantsToStore = new[]
             {
@@ -303,9 +306,9 @@ namespace IdentityServer4.Contrib.Caching.Redis.Tests
                 {
                     ClientId = "1",
                     CreationTime = DateTime.UtcNow,
-                    Expiration = DateTime.UtcNow.AddDays(1),
+                    Expiration = DateTime.UtcNow.AddHours(1),
                     Key = Guid.NewGuid().ToString(),
-                    SubjectId = subjectId1,
+                    SubjectId = subjectId,
                     Type = "Some-Type",
                     Data = "Some-Data"
                 },
@@ -313,9 +316,9 @@ namespace IdentityServer4.Contrib.Caching.Redis.Tests
                 {
                     ClientId = "1",
                     CreationTime = DateTime.UtcNow,
-                    Expiration = DateTime.UtcNow.AddDays(1),
+                    Expiration = DateTime.UtcNow.AddHours(1),
                     Key = Guid.NewGuid().ToString(),
-                    SubjectId = subjectId1,
+                    SubjectId = subjectId,
                     Type = "Some-Type",
                     Data = "Some-Data"
                 },
@@ -323,9 +326,9 @@ namespace IdentityServer4.Contrib.Caching.Redis.Tests
                 {
                     ClientId = "2",
                     CreationTime = DateTime.UtcNow,
-                    Expiration = DateTime.UtcNow.AddDays(1),
+                    Expiration = DateTime.UtcNow.AddHours(1),
                     Key = Guid.NewGuid().ToString(),
-                    SubjectId = subjectId1,
+                    SubjectId = subjectId,
                     Type = "Some-Type",
                     Data = "Some-Data"
                 },
@@ -333,37 +336,36 @@ namespace IdentityServer4.Contrib.Caching.Redis.Tests
                 {
                     ClientId = "1",
                     CreationTime = DateTime.UtcNow,
-                    Expiration = DateTime.UtcNow.AddDays(1),
+                    Expiration = DateTime.UtcNow.AddHours(1),
                     Key = Guid.NewGuid().ToString(),
-                    SubjectId = subjectId1,
+                    SubjectId = subjectId,
                     Type = "Some-Type",
                     Data = "Some-Data"
                 },
             };
 
-            foreach (var grant in grantsToStore)
-            {
-                await cacheService.StoreAsync(grant);
-            }
+            await Task.WhenAll(grantsToStore.Select(async grant => await cacheService.StoreAsync(grant)));
 
-            await cacheService.RemoveAllAsync(subjectId1, "1");
+            await cacheService.RemoveAllAsync(subjectId, "1");
 
-            var foundGrantTypes = await cacheService.GetAllAsync(subjectId1);
-            var enumeratedGrants = foundGrantTypes as PersistedGrant[] ?? foundGrantTypes.ToArray();
+            var foundGrants = await cacheService.GetAllAsync(subjectId);
+            var enumeratedGrants = foundGrants.Where(grant => grant.ClientId != "1").ToArray();
             Assert.NotEmpty(enumeratedGrants);
             Assert.Single(enumeratedGrants);
             Assert.Equal(GetBytes(Serialize(grantsToStore[2])), GetBytes(Serialize(enumeratedGrants.First())));
         }
-        
+
         [Fact]
-        public async Task RedisCacheGrantStoreService_RemoveAllAsync_SubjectId_ClientId_Type_Removes_Only_Wanted()
+        public async Task RedisCacheGrantStore_RemoveAllAsync_SubjectId_ClientId_Type_Removes_Only_Wanted()
         {
             var provider =
                 this.serviceProviderFixture.BuildDefaultServiceProvider(this.configurationFixture.RedisCacheOptions);
 
             var cacheService = provider.GetRequiredService<IPersistedGrantStore>();
 
-            var subjectId1 = Guid.NewGuid().ToString();
+            var subjectId = Guid.NewGuid().ToString();
+            const string tokenType = "token";
+            const string refreshTokenType = "refreshToken";
 
             var grantsToStore = new[]
             {
@@ -371,60 +373,61 @@ namespace IdentityServer4.Contrib.Caching.Redis.Tests
                 {
                     ClientId = "1",
                     CreationTime = DateTime.UtcNow,
-                    Expiration = DateTime.UtcNow.AddDays(1),
+                    Expiration = DateTime.UtcNow.AddHours(1),
                     Key = Guid.NewGuid().ToString(),
-                    SubjectId = subjectId1,
+                    SubjectId = subjectId,
                     Data = "Some-Data",
-                    Type = SubjectTypes.Global.ToString(),
+                    Type = tokenType
                 },
                 new PersistedGrant
                 {
                     ClientId = "1",
                     CreationTime = DateTime.UtcNow,
-                    Expiration = DateTime.UtcNow.AddDays(1),
+                    Expiration = DateTime.UtcNow.AddHours(1),
                     Key = Guid.NewGuid().ToString(),
-                    SubjectId = subjectId1,
+                    SubjectId = subjectId,
                     Data = "Some-Data",
-                    Type = SubjectTypes.Global.ToString(),
+                    Type = tokenType
                 },
                 new PersistedGrant
                 {
                     ClientId = "1",
                     CreationTime = DateTime.UtcNow,
-                    Expiration = DateTime.UtcNow.AddDays(1),
+                    Expiration = DateTime.UtcNow.AddHours(1),
                     Key = Guid.NewGuid().ToString(),
-                    SubjectId = subjectId1,
+                    SubjectId = subjectId,
                     Data = "Some-Data",
-                    Type = SubjectTypes.Global.ToString(),
+                    Type = tokenType
                 },
                 new PersistedGrant
                 {
                     ClientId = "2",
                     CreationTime = DateTime.UtcNow,
-                    Expiration = DateTime.UtcNow.AddDays(1),
+                    Expiration = DateTime.UtcNow.AddHours(1),
                     Key = Guid.NewGuid().ToString(),
-                    SubjectId = subjectId1,
+                    SubjectId = subjectId,
                     Data = "Some-Data",
-                    Type = SubjectTypes.Ppid.ToString(),
+                    Type = refreshTokenType
                 },
             };
 
-            foreach (var grant in grantsToStore)
-            {
-                await cacheService.StoreAsync(grant);
-            }
+            await Task.WhenAll(grantsToStore.Select(async grant => await cacheService.StoreAsync(grant)));
 
-            await cacheService.RemoveAllAsync(subjectId1, "1", SubjectTypes.Global.ToString());
+            await cacheService.RemoveAllAsync(subjectId, "1", tokenType);
 
-            var foundGrantTypes = await cacheService.GetAllAsync(subjectId1);
-            var enumeratedGrants = foundGrantTypes as PersistedGrant[] ?? foundGrantTypes.ToArray();
+            var foundGrantTypes = await cacheService.GetAllAsync(subjectId);
+
+            var enumeratedGrants = foundGrantTypes
+                .Where(grant => grant.ClientId != "1" && grant.Type != tokenType)
+                .ToArray();
+
             Assert.NotEmpty(enumeratedGrants);
             Assert.Single(enumeratedGrants);
             Assert.Equal(GetBytes(Serialize(grantsToStore[3])), GetBytes(Serialize(enumeratedGrants.First())));
         }
 
         private static string Serialize(object @object) =>
-            JsonConvert.SerializeObject(@object, DistributedCacheGrantStoreService.SerializerSettings);
+            JsonConvert.SerializeObject(@object, RedisCacheGrantStore.SerializerSettings);
 
         private static byte[] GetBytes(string value) => Encoding.UTF8.GetBytes(value);
     }

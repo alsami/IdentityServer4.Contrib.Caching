@@ -3,9 +3,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using IdentityServer4.Contrib.Caching.Abstractions.Stores;
-using IdentityServer4.Contrib.Caching.Abstractions.Tests.Misc;
-using IdentityServer4.Contrib.Caching.TestInfrastructure;
+using IdentityServer4.Contrib.Caching.Redis.Stores;
+using IdentityServer4.Contrib.Caching.Redis.Tests.Misc;
 using IdentityServer4.Models;
 using IdentityServer4.Stores;
 using Microsoft.Extensions.Caching.Distributed;
@@ -14,13 +13,13 @@ using Moq;
 using Newtonsoft.Json;
 using Xunit;
 
-namespace IdentityServer4.Contrib.Caching.Abstractions.Tests
+namespace IdentityServer4.Contrib.Caching.Redis.Tests
 {
-    public class DistributedCacheGrantStoreServiceTests : IClassFixture<ServiceProviderFixture>
+    public class RedisCacheGrantStoreServiceTests : IClassFixture<ServiceProviderFixture>
     {
         private readonly ServiceProviderFixture serviceProviderFixture;
 
-        public DistributedCacheGrantStoreServiceTests(ServiceProviderFixture serviceProviderFixture)
+        public RedisCacheGrantStoreServiceTests(ServiceProviderFixture serviceProviderFixture)
         {
             this.serviceProviderFixture = serviceProviderFixture;
         }
@@ -28,9 +27,11 @@ namespace IdentityServer4.Contrib.Caching.Abstractions.Tests
         [Fact]
         public async Task DistributedCacheGrantStoreService_GetAllAsync_Valid_Subject_Id_Returns_Enumeration()
         {
-            var mock = this.serviceProviderFixture.CreateDistributedCacheMock();
+            var cacheMock = this.serviceProviderFixture.CreateDistributedCacheMock();
 
-            var provider = this.serviceProviderFixture.BuildDefaultServiceProvider<DummyStore>(mock.Object);
+            var lockManagerMock = this.serviceProviderFixture.CreateRedisLockManagerMock();
+
+            var provider = this.serviceProviderFixture.BuildMockServiceProvider(cacheMock.Object, lockManagerMock.Object);
 
             var cacheService = provider.GetRequiredService<IPersistedGrantStore>();
 
@@ -54,12 +55,12 @@ namespace IdentityServer4.Contrib.Caching.Abstractions.Tests
 
             var bytes = GetBytes(Serialize(grants));
 
-            mock.Setup(cache => cache.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            cacheMock.Setup(cache => cache.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(bytes);
 
             var foundGrants = await cacheService.GetAllAsync(subjectId.ToString());
 
-            mock.Verify(
+            cacheMock.Verify(
                 cache => cache.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
 
             Assert.NotNull(foundGrants);
@@ -72,23 +73,25 @@ namespace IdentityServer4.Contrib.Caching.Abstractions.Tests
         [Fact]
         public async Task DistributedCacheGrantStoreService_GetAllAsync_Invalid_Subject_Id_Returns_Empty_Enumeration()
         {
-            var mock = this.serviceProviderFixture.CreateDistributedCacheMock();
+            var cacheMock = this.serviceProviderFixture.CreateDistributedCacheMock();
 
-            var provider = this.serviceProviderFixture.BuildDefaultServiceProvider<DummyStore>(mock.Object);
+            var lockManagerMock = this.serviceProviderFixture.CreateRedisLockManagerMock();
+
+            var provider = this.serviceProviderFixture.BuildMockServiceProvider(cacheMock.Object, lockManagerMock.Object);
 
             var cacheService = provider.GetRequiredService<IPersistedGrantStore>();
 
             var subjectId = Guid.NewGuid();
 
-            mock.Setup(cache => cache.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync((byte[]) null);
+            cacheMock.Setup(cache => cache.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((byte[])null);
 
             var foundGrants = await cacheService.GetAllAsync(subjectId.ToString());
 
-            mock.Verify(
+            cacheMock.Verify(
                 cache => cache.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
 
-            mock.Verify(cache => cache.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+            cacheMock.Verify(cache => cache.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
 
             Assert.NotNull(foundGrants);
             Assert.Empty(foundGrants);
@@ -98,9 +101,11 @@ namespace IdentityServer4.Contrib.Caching.Abstractions.Tests
         public async Task
             DistributedCacheGrantStoreService_RemoveAllAsync_For_Valid_SubjectId_And_ClientId_Returns_Enumeration()
         {
-            var mock = this.serviceProviderFixture.CreateDistributedCacheMock();
+            var cacheMock = this.serviceProviderFixture.CreateDistributedCacheMock();
 
-            var provider = this.serviceProviderFixture.BuildDefaultServiceProvider<DummyStore>(mock.Object);
+            var lockManagerMock = this.serviceProviderFixture.CreateRedisLockManagerMock();
+
+            var provider = this.serviceProviderFixture.BuildMockServiceProvider(cacheMock.Object, lockManagerMock.Object);
 
             var cacheService = provider.GetRequiredService<IPersistedGrantStore>();
 
@@ -130,25 +135,27 @@ namespace IdentityServer4.Contrib.Caching.Abstractions.Tests
 
             var bytes = GetBytes(Serialize(grants));
 
-            mock.Setup(cache => cache.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            cacheMock.Setup(cache => cache.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(bytes);
 
             await cacheService.RemoveAllAsync(subjectId.ToString(), "1");
 
-            mock.Verify(
-                cache => cache.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Exactly(2));
+            cacheMock.Verify(
+                cache => cache.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
 
-            mock.Verify(cache => cache.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()),
-                Times.Exactly(3));
+            cacheMock.Verify(cache => cache.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()),
+                Times.Exactly(4));
         }
 
         [Fact]
         public async Task
             DistributedCacheGrantStoreService_RemoveAllAsync_For_Valid_SubjectId_And_ClientId_NoValues_Found()
         {
-            var mock = this.serviceProviderFixture.CreateDistributedCacheMock();
+            var cacheMock = this.serviceProviderFixture.CreateDistributedCacheMock();
 
-            var provider = this.serviceProviderFixture.BuildDefaultServiceProvider<DummyStore>(mock.Object);
+            var lockManagerMock = this.serviceProviderFixture.CreateRedisLockManagerMock();
+
+            var provider = this.serviceProviderFixture.BuildMockServiceProvider(cacheMock.Object, lockManagerMock.Object);
 
             var cacheService = provider.GetRequiredService<IPersistedGrantStore>();
 
@@ -178,24 +185,26 @@ namespace IdentityServer4.Contrib.Caching.Abstractions.Tests
 
             var bytes = GetBytes(Serialize(grants));
 
-            mock.Setup(cache => cache.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            cacheMock.Setup(cache => cache.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(bytes);
 
             await cacheService.RemoveAllAsync(subjectId.ToString(), "1");
 
-            mock.Verify(
-                cache => cache.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Exactly(4));
+            cacheMock.Verify(
+                cache => cache.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
 
-            mock.Verify(cache => cache.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
+            cacheMock.Verify(cache => cache.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
         }
 
         [Fact]
         public async Task
             DistributedCacheGrantStoreService_RemoveAllAsync_For_Valid_SubjectId_ClientId_Type_Returns_Enumeration()
         {
-            var mock = this.serviceProviderFixture.CreateDistributedCacheMock();
+            var cacheMock = this.serviceProviderFixture.CreateDistributedCacheMock();
 
-            var provider = this.serviceProviderFixture.BuildDefaultServiceProvider<DummyStore>(mock.Object);
+            var lockManagerMock = this.serviceProviderFixture.CreateRedisLockManagerMock();
+
+            var provider = this.serviceProviderFixture.BuildMockServiceProvider(cacheMock.Object, lockManagerMock.Object);
 
             var cacheService = provider.GetRequiredService<IPersistedGrantStore>();
 
@@ -220,40 +229,35 @@ namespace IdentityServer4.Contrib.Caching.Abstractions.Tests
                 new PersistedGrant
                 {
                     SubjectId = subjectId.ToString(),
-                    ClientId = "2",
+                    ClientId = "1",
                     Type = SubjectTypes.Global.ToString(),
                     Expiration = DateTime.UtcNow.AddDays(1),
                 },
-                new PersistedGrant
-                {
-                    SubjectId = subjectId.ToString(),
-                    ClientId = "2",
-                    Type = SubjectTypes.Ppid.ToString(),
-                    Expiration = DateTime.UtcNow.AddDays(1),
-                }
             };
 
             var bytes = GetBytes(Serialize(grants));
 
-            mock.Setup(cache => cache.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            cacheMock.Setup(cache => cache.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(bytes);
 
             await cacheService.RemoveAllAsync(subjectId.ToString(), "1", SubjectTypes.Global.ToString());
 
-            mock.Verify(
-                cache => cache.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Exactly(2));
+            cacheMock.Verify(
+                cache => cache.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
 
-            mock.Verify(cache => cache.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()),
-                Times.Exactly(3));
+            cacheMock.Verify(cache => cache.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()),
+                Times.Exactly(6));
         }
 
         [Fact]
         public async Task
             DistributedCacheGrantStoreService_RemoveAllAsync_For_Valid_SubjectId_ClientId_Type_No_Values_Found()
         {
-            var mock = this.serviceProviderFixture.CreateDistributedCacheMock();
+            var cacheMock = this.serviceProviderFixture.CreateDistributedCacheMock();
 
-            var provider = this.serviceProviderFixture.BuildDefaultServiceProvider<DummyStore>(mock.Object);
+            var lockManagerMock = this.serviceProviderFixture.CreateRedisLockManagerMock();
+
+            var provider = this.serviceProviderFixture.BuildMockServiceProvider(cacheMock.Object, lockManagerMock.Object);
 
             var cacheService = provider.GetRequiredService<IPersistedGrantStore>();
 
@@ -264,62 +268,61 @@ namespace IdentityServer4.Contrib.Caching.Abstractions.Tests
                 new PersistedGrant
                 {
                     SubjectId = subjectId.ToString(),
-                    ClientId = "1",
-                    Type = SubjectTypes.Global.ToString()
-                },
-                new PersistedGrant
-                {
-                    SubjectId = subjectId.ToString(),
-                    ClientId = "1",
-                    Type = SubjectTypes.Global.ToString()
-                },
-                new PersistedGrant
-                {
-                    SubjectId = subjectId.ToString(),
-                    ClientId = "1",
+                    ClientId = "2",
                     Type = SubjectTypes.Global.ToString()
                 },
                 new PersistedGrant
                 {
                     SubjectId = subjectId.ToString(),
                     ClientId = "2",
-                    Type = SubjectTypes.Ppid.ToString()
+                    Type = SubjectTypes.Global.ToString()
+                },
+                new PersistedGrant
+                {
+                    SubjectId = subjectId.ToString(),
+                    ClientId = "2",
+                    Type = SubjectTypes.Global.ToString()
                 }
             };
 
             var bytes = GetBytes(Serialize(grants));
 
-            mock.Setup(cache => cache.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            cacheMock.Setup(cache => cache.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(bytes);
 
             await cacheService.RemoveAllAsync(subjectId.ToString(), "2", SubjectTypes.Global.ToString());
 
-            mock.Verify(
+            cacheMock.Verify(
                 cache => cache.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
 
-            mock.Verify(cache => cache.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
+            cacheMock.Verify(cache => cache.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Exactly(6));
         }
 
         [Fact]
         public async Task DistributedCacheGrantStoreService_RemoveAsync_Succeeds()
         {
-            var mock = this.serviceProviderFixture.CreateDistributedCacheMock();
+            var cacheMock = this.serviceProviderFixture.CreateDistributedCacheMock();
 
-            var provider = this.serviceProviderFixture.BuildDefaultServiceProvider<DummyStore>(mock.Object);
+            var lockManagerMock = this.serviceProviderFixture.CreateRedisLockManagerMock();
+
+            var provider = this.serviceProviderFixture.BuildMockServiceProvider(cacheMock.Object, lockManagerMock.Object);
 
             var cacheService = provider.GetRequiredService<IPersistedGrantStore>();
 
             await cacheService.RemoveAsync("some-key-that-is-not-relevant");
 
-            mock.Verify(
+            cacheMock.Verify(
                 cache => cache.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
         public async Task DistributedCacheGrantStoreService_GetAsync_Valid_Key_Succeeds()
         {
-            var mock = this.serviceProviderFixture.CreateDistributedCacheMock();
-            var provider = this.serviceProviderFixture.BuildDefaultServiceProvider<DummyStore>(mock.Object);
+            var cacheMock = this.serviceProviderFixture.CreateDistributedCacheMock();
+
+            var lockManagerMock = this.serviceProviderFixture.CreateRedisLockManagerMock();
+
+            var provider = this.serviceProviderFixture.BuildMockServiceProvider(cacheMock.Object, lockManagerMock.Object);
 
             var cacheStoreService = provider.GetRequiredService<IPersistedGrantStore>();
 
@@ -338,13 +341,13 @@ namespace IdentityServer4.Contrib.Caching.Abstractions.Tests
 
             var returnBytes = GetBytes(Serialize(grant));
 
-            mock.Setup(cache =>
+            cacheMock.Setup(cache =>
                     cache.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(returnBytes);
 
             var foundGrant = await cacheStoreService.GetAsync(key.ToString());
 
-            mock.Verify(
+            cacheMock.Verify(
                 cache => cache.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
 
             Assert.NotNull(foundGrant);
@@ -355,9 +358,11 @@ namespace IdentityServer4.Contrib.Caching.Abstractions.Tests
         [Fact]
         public async Task DistributedCacheGrantStoreService_StoreAsync_Verify_Calls_And_Return_Values_Succeeds()
         {
-            var mock = this.serviceProviderFixture.CreateDistributedCacheMock();
+            var cacheMock = this.serviceProviderFixture.CreateDistributedCacheMock();
 
-            var provider = this.serviceProviderFixture.BuildDefaultServiceProvider<DummyStore>(mock.Object);
+            var lockManagerMock = this.serviceProviderFixture.CreateRedisLockManagerMock();
+
+            var provider = this.serviceProviderFixture.BuildMockServiceProvider(cacheMock.Object, lockManagerMock.Object);
 
             var cacheStoreService = provider.GetRequiredService<IPersistedGrantStore>();
 
@@ -379,22 +384,22 @@ namespace IdentityServer4.Contrib.Caching.Abstractions.Tests
 
             var bytes = GetBytes(Serialize(grants));
 
-            mock.Setup(cache => cache.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            cacheMock.Setup(cache => cache.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(bytes);
 
             await cacheStoreService.StoreAsync(grants[0]);
 
-            mock.Verify(cache => cache.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+            cacheMock.Verify(cache => cache.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Exactly(3));
 
-            mock.Verify(cache => cache.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()),
+            cacheMock.Verify(cache => cache.RemoveAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()),
                 Times.Never);
 
-            mock.Verify(cache => cache.SetAsync(It.IsAny<string>(), It.IsAny<byte[]>(),
-                It.IsAny<DistributedCacheEntryOptions>(), It.IsAny<CancellationToken>()), Times.Exactly(2));
+            cacheMock.Verify(cache => cache.SetAsync(It.IsAny<string>(), It.IsAny<byte[]>(),
+                It.IsAny<DistributedCacheEntryOptions>(), It.IsAny<CancellationToken>()), Times.Exactly(4));
         }
 
         private static string Serialize(object @object) =>
-            JsonConvert.SerializeObject(@object, DistributedCacheGrantStoreService.SerializerSettings);
+            JsonConvert.SerializeObject(@object, RedisCacheGrantStore.SerializerSettings);
 
         private static byte[] GetBytes(string value) => Encoding.UTF8.GetBytes(value);
     }

@@ -1,6 +1,6 @@
 using System;
-using System.Reflection;
-using IdentityServer4.Contrib.Caching.Abstractions.Configuration;
+using Elders.RedLock;
+using IdentityServer4.Contrib.Caching.Redis.Configuration;
 using IdentityServer4.Contrib.Caching.Redis.Tests.Misc;
 using IdentityServer4.Stores;
 using Microsoft.Extensions.Caching.Distributed;
@@ -35,11 +35,12 @@ namespace IdentityServer4.Contrib.Caching.Redis.Tests
             var provider =
                 this.serviceProviderFixture.BuildDefaultServiceProvider(this.configurationFixture.RedisCacheOptions);
 
-            provider.GetRequiredService<IOptions<IdentityServerDistributedCacheConfiguration>>();
+            provider.GetRequiredService<IOptions<RedisCacheGrantStoreConfiguration>>();
             provider.GetRequiredService<IOptions<RedisCacheOptions>>();
+            provider.GetRequiredService<IOptions<RedLockOptions>>();
             provider.GetRequiredService<IDistributedCache>();
-            var store = provider.GetRequiredService<IPersistedGrantStore>();
-            Assert.True(typeof(IPersistedGrantStore).IsAssignableFrom(store.GetType().GetTypeInfo()));
+            provider.GetRequiredService<IPersistedGrantStore>();
+            provider.GetRequiredService<IRedisLockManager>();
         }
 
         [Fact]
@@ -51,11 +52,12 @@ namespace IdentityServer4.Contrib.Caching.Redis.Tests
                 options.InstanceName = this.configurationFixture.RedisCacheOptions.InstanceName;
             });
 
-            provider.GetRequiredService<IOptions<IdentityServerDistributedCacheConfiguration>>();
+            provider.GetRequiredService<IOptions<RedisCacheGrantStoreConfiguration>>();
             provider.GetRequiredService<IOptions<RedisCacheOptions>>();
+            provider.GetRequiredService<IOptions<RedLockOptions>>();
             provider.GetRequiredService<IDistributedCache>();
-            var store = provider.GetRequiredService<IPersistedGrantStore>();
-            Assert.True(typeof(IPersistedGrantStore).IsAssignableFrom(store.GetType().GetTypeInfo()));
+            provider.GetRequiredService<IPersistedGrantStore>();
+            provider.GetRequiredService<IRedisLockManager>();
         }
     }
 }
