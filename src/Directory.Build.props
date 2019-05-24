@@ -12,7 +12,7 @@
     <PackageReleaseNotes>https://github.com/cleancodelabs/IdentityServer4.Contrib.Caching.Distributed/blob/master/changelog.md</PackageReleaseNotes>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>git://github.com/cleancodelabs/IdentityServer4.Contrib.Caching.Distributed</RepositoryUrl>
-    <Version>1.0.0-beta.1</Version>
+    <Version>1.0.0-rc.0</Version>
     <FileVersion>1.0.0.0</FileVersion>
   </PropertyGroup>
   <ItemGroup>

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace IdentityServer4.Contrib.Caching.Abstractions.Extensions
+namespace IdentityServer4.Contrib.Caching.Redis.Extensions
 {
     public static class StringExtensions
     {

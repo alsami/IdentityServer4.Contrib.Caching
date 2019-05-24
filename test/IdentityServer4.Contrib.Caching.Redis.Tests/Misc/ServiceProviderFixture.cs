@@ -1,7 +1,5 @@
 ﻿using System;
-using IdentityServer4.Contrib.Caching.Abstractions.Extensions;
 using IdentityServer4.Contrib.Caching.Redis.Extensions;
-using IdentityServer4.Contrib.Caching.Redis.Stores;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,7 +10,6 @@ namespace IdentityServer4.Contrib.Caching.Redis.Tests.Misc
         public IServiceProvider BuildDefaultServiceProvider(RedisCacheOptions options)
             => new ServiceCollection()
                 .AddIdentityServerBuilder()
-                .AddDistributedCacheGrantStore<RedisCacheGrantStoreService>()
                 .AddDistributedRedisCache(options.Configuration, options.InstanceName)
                 .Services
                 .BuildServiceProvider();
@@ -20,8 +17,8 @@ namespace IdentityServer4.Contrib.Caching.Redis.Tests.Misc
         public IServiceProvider BuildDefaultServiceProvider(Action<RedisCacheOptions> options)
             => new ServiceCollection()
                 .AddIdentityServerBuilder()
-                .AddDistributedCacheGrantStore<RedisCacheGrantStoreService>()
-                .AddDistributedRedisCache(options)
+                .AddDistributedRedisCache(options,
+                    cacheOptions => cacheOptions.CachingKeyPrefix = "_IdentityServer_Redis_Cache_Grant_Store_")
                 .Services
                 .BuildServiceProvider();
     }

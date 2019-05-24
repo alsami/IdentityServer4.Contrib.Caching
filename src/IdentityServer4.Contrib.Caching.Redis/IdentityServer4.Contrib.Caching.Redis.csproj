@@ -5,11 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="IdentityServer4" Version="2.4.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="2.2.5" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\IdentityServer4.Contrib.Caching.Abstractions\IdentityServer4.Contrib.Caching.Abstractions.csproj" />
+    <PackageReference Include="RedLock" Version="4.0.0" />
   </ItemGroup>
 
 </Project>
