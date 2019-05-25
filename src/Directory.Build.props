@@ -4,7 +4,7 @@
     <IsPackable>true</IsPackable>
     <Copyright>2019©CleanCode-Labs</Copyright>
     <Authors>Sami Al Khatib</Authors>
-    <Description>OpenID Connect and OAuth 2.0 distributed caching library IdentityServer4 and Microsoft.Extensions.Caching.Distributed.Abstractions</Description>
+    <Description>Distributed caching library for IdentityServer4 using a distributed redis-cache.</Description>
     <PackageTags>OAuth2;OAuth 2.0;OpenID Connect;IdentityServer;IdentityServer4;Caching;DistributedCaching;Redis;Memory;</PackageTags>
     <PackageIconUrl>https://raw.githubusercontent.com/cleancodelabs/IdentityServer4.Contrib.Caching.Distributed/master/assets/icon.jpg</PackageIconUrl>
     <PackageProjectUrl>https://github.com/cleancodelabs/IdentityServer4.Contrib.Caching.Distributed</PackageProjectUrl>
@@ -12,7 +12,7 @@
     <PackageReleaseNotes>https://github.com/cleancodelabs/IdentityServer4.Contrib.Caching.Distributed/blob/master/changelog.md</PackageReleaseNotes>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>git://github.com/cleancodelabs/IdentityServer4.Contrib.Caching.Distributed</RepositoryUrl>
-    <Version>1.0.0-rc.0</Version>
+    <Version>1.0.0</Version>
     <FileVersion>1.0.0.0</FileVersion>
   </PropertyGroup>
   <ItemGroup>

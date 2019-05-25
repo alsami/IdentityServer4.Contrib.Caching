@@ -4,7 +4,7 @@
 
 ### Initial release
 
-This is the first release that uses `IDistributedCache` with the implementation of [Microsoft.Extensions.Caching.StackExchangeRedis](https://www.nuget.org/packages/Microsoft.Extensions.Caching.StackExchangeRedis/2.2.5) for storing grants of `IdentityServer4` in a distributed fashion. For more information on how to install and use this package, please checkout the [readme](readme.md).
+This is the first official release that uses `IDistributedCache` with the implementation of [Microsoft.Extensions.Caching.StackExchangeRedis](https://www.nuget.org/packages/Microsoft.Extensions.Caching.StackExchangeRedis/2.2.5) for storing grants of `IdentityServer4` in a distributed fashion. For more information on how to install and use this package, please checkout the [readme](readme.md).
 
 
 
