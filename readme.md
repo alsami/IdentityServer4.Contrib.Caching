@@ -8,7 +8,7 @@
 
 This library is written in .netstandard2.0 and provides an implementation of `IPersistedGrantStore` for `IdentityServer4` using the `IDistributedCache` interface and Redis implementation located in [Microsoft.Extensions.Caching.StackExchangeRedis](https://www.nuget.org/packages/Microsoft.Extensions.Caching.StackExchangeRedis/2.2.5), that can easily be registered using provided extension methods for `IIdentityServerBuilder`.
 
-It also used [RedLock](https://www.nuget.org/packages/RedLock/) for pessimistic locking of resources in Redis.
+It also makes use of [RedLock](https://www.nuget.org/packages/RedLock/) for pessimistic locking of resources in Redis.
 
 ## How it works
 
@@ -31,10 +31,12 @@ To ensure that no values are overwritten, `RedLock` is used to temporally lock t
 
 This package is available via nuget. You can install it using Visual-Studio-Nuget-Browser or by using the dotnet-cli.
 
-dotnet add package IdentityServer4.Contrib.Caching.Redis
+`dotnet add package IdentityServer4.Contrib.Caching.Redis`
+
 If you want to add a specific version of this package
 
-dotnet add package IdentityServer4.Contrib.Caching.Redis --version 1.0.0
+`dotnet add package IdentityServer4.Contrib.Caching.Redis --version 1.0.0`
+
 For more information please visit the official dotnet-cli documentation.
 
 ## Usage
