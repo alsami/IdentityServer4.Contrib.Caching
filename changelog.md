@@ -1,3 +1,11 @@
+# [1.0.1](https://www.nuget.org/packages/IdentityServer4.Contrib.Caching.Redis/1.0.1) (2019-05-31)
+
+## IdentityServer4.Contrib.Caching.Redis
+
+### Fixes
+
+* When connection-string is not available, the cache-options are used to build the connection-string. Fixes #1
+
 # [1.0.0](https://www.nuget.org/packages/IdentityServer4.Contrib.Caching.Redis/1.0.0) (2019-05-25)
 
 ## IdentityServer4.Contrib.Caching.Redis

@@ -107,7 +107,14 @@ namespace IdentityServer4.Contrib.Caching.Redis.Extensions
         }
 
         private static IRedisLockManager CreateRedisLockManager(IServiceProvider provider)
-            => new RedisLockManager(provider.GetRequiredService<IOptions<RedLockOptions>>().Value,
-                provider.GetRequiredService<IOptions<RedisCacheOptions>>().Value.Configuration);
+        {
+            var options = provider.GetRequiredService<IOptions<RedisCacheOptions>>().Value;
+
+            var connection = string.IsNullOrWhiteSpace(options.Configuration)
+                ? options.ConfigurationOptions.ToString(true)
+                : options.Configuration;
+            
+            return new RedisLockManager(provider.GetRequiredService<IOptions<RedLockOptions>>().Value, connection);
+        }
     }
 }
