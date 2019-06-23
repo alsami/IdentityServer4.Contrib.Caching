@@ -13,7 +13,7 @@ namespace IdentityServer4.Contrib.Caching.Redis.Extensions
         private static readonly RedLockOptions RedLockOptions = new RedLockOptions
         {
             LockRetryCount = 3,
-            LockRetryDelay = TimeSpan.FromMilliseconds(500)
+            LockRetryDelay = TimeSpan.FromMilliseconds(100)
         };
 
         /// <summary>

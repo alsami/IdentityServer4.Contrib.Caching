@@ -1,3 +1,12 @@
+# [1.0.2](https://www.nuget.org/packages/IdentityServer4.Contrib.Caching.Redis/1.0.2) (2019-06-23)
+
+## IdentityServer4.Contrib.Caching.Redis
+
+### Features
+
+* Update `RedLock` to version 4.0.1
+* Change default retry-delay of `RedLockOptions` to `100ms`
+
 # [1.0.1](https://www.nuget.org/packages/IdentityServer4.Contrib.Caching.Redis/1.0.1) (2019-05-31)
 
 ## IdentityServer4.Contrib.Caching.Redis

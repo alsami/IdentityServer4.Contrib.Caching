@@ -21,7 +21,7 @@ namespace IdentityServer4.Contrib.Caching.Redis.Stores
             NullValueHandling = NullValueHandling.Ignore,
             ContractResolver = new CamelCasePropertyNamesContractResolver()
         };
-
+        
         private readonly RedisCacheGrantStoreConfiguration cacheGrantStoreConfiguration;
         private readonly IDistributedCache distributedCache;
         private readonly IRedisLockManager redisLockManager;
