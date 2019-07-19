@@ -1,3 +1,11 @@
+# [1.1.0](https://www.nuget.org/packages/IdentityServer4.Contrib.Caching.Redis/1.1.0) (2019-07-19)
+
+## IdentityServer4.Contrib.Caching.Redis
+
+### Chore
+
+* Update `IdentityServer4` to version 2.5.0
+
 # [1.0.2](https://www.nuget.org/packages/IdentityServer4.Contrib.Caching.Redis/1.0.2) (2019-06-23)
 
 ## IdentityServer4.Contrib.Caching.Redis
