@@ -1,9 +1,8 @@
-sudo: required
 dist: bionic
 language: csharp
-solution: IdentityServer4.Contrib.Caching
+solution: IndentityServer4.Contrib.Caching.Distributed.sln
 mono: none
-dotnet: 3.0.100
+dotnet: 2.2.300
 env:
   global:
     - RedisCacheOptions__Configuration="127.0.0.1:6379"
