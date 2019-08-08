@@ -1,13 +1,8 @@
-sudo: required
 dist: bionic
 language: csharp
 solution: IndentityServer4.Contrib.Caching.Distributed.sln
 mono: none
-addons:
-  snaps:
-  - name: dotnet-sdk
-    classic: true
-    channel: latest/beta
+dotnet: 2.2.300
 env:
   global:
     - RedisCacheOptions__Configuration="127.0.0.1:6379"
@@ -20,19 +15,13 @@ jobs:
   include:
     - stage: build
       name: build solution
-      before_script:
-        - sudo snap alias dotnet-sdk.dotnet dotnet
       script: dotnet restore && dotnet build
     - stage: test
       name: run-tests
       services: redis-server
-      before_script:
-        - sudo snap alias dotnet-sdk.dotnet dotnet
       script: ./run-tests.sh
     - stage: publish
       name: publish-packages
       if: tag IS present
-      before_script:
-        - sudo snap alias dotnet-sdk.dotnet dotnet
       script: ./publish-packages.sh "$NUGET_SOURCE" "$NUGET_APIKEY" "$TRAVIS_TAG"
 
