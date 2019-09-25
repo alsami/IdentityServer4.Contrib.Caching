@@ -2,7 +2,7 @@
 
 ## IdentityServer4.Contrib.Caching.Redis
 
-## Features
+### Features
 
 * Update `IdentityServer4` to 3.0.1
 
