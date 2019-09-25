@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{4DABE59E-F29C-44CB-BA55-D80F6417D493}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2170438C-D7CD-4B4D-93AA-5BEB652950CF}"
+ProjectSection(SolutionItems) = preProject
+	src\Directory.Build.props = src\Directory.Build.props
+EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "misc", "misc", "{CF216984-8F3E-49F1-96F8-9394B6B3F4C4}"
 	ProjectSection(SolutionItems) = preProject
@@ -13,7 +16,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "misc", "misc", "{CF216984-8
 		.travis.yml = .travis.yml
 		changelog.md = changelog.md
 		dev_environment.md = dev_environment.md
-		src\Directory.Build.props = src\Directory.Build.props
 		LICENSE = LICENSE
 		publish-packages.sh = publish-packages.sh
 		readme.md = readme.md
