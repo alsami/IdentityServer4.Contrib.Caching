@@ -1,3 +1,11 @@
+# [3.1.0](https://www.nuget.org/packages/IdentityServer4.Contrib.Caching.Redis/3.1.0) (2019-12-11)
+
+## IdentityServer4.Contrib.Caching.Redis
+
+### Features
+
+* Update deps to `3.1.0`
+
 # [3.0.2](https://www.nuget.org/packages/IdentityServer4.Contrib.Caching.Redis/3.0.2) (2019-11-12)
 
 ## IdentityServer4.Contrib.Caching.Redis
