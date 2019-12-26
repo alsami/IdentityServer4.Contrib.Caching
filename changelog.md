@@ -1,8 +1,20 @@
+# [3.1.1](https://www.nuget.org/packages/IdentityServer4.Contrib.Caching.Redis/3.1.1) (2019-12-26)
+
+## IdentityServer4.Contrib.Caching.Redis
+
+### Chore
+
+* Update `IdentityServer4` to `3.1.0`
+
 # [3.1.0](https://www.nuget.org/packages/IdentityServer4.Contrib.Caching.Redis/3.1.0) (2019-12-11)
 
 ## IdentityServer4.Contrib.Caching.Redis
 
-### Features
+### Breaking changes
+
+* Library now requires .NET-Core 3.1
+
+### Chore
 
 * Update deps to `3.1.0`
 

@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <LangVersion>7.2</LangVersion>
+    <LangVersion>8</LangVersion>
     <IsPackable>true</IsPackable>
     <Copyright>2019©CleanCode-Labs</Copyright>
     <Authors>Sami Al Khatib</Authors>
@@ -12,8 +12,8 @@
     <PackageReleaseNotes>https://github.com/cleancodelabs/IdentityServer4.Contrib.Caching.Distributed/blob/master/changelog.md</PackageReleaseNotes>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>git://github.com/cleancodelabs/IdentityServer4.Contrib.Caching.Distributed</RepositoryUrl>
-    <Version>3.1.0</Version>
-    <FileVersion>3.1.0.0</FileVersion>
+    <Version>3.1.1</Version>
+    <FileVersion>3.1.1.0</FileVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
